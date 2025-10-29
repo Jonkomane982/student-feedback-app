@@ -148,6 +148,24 @@ const htmlContent = `<!DOCTYPE html>
             border-radius: 8px;
             margin-bottom: 1rem;
             border-left: 4px solid #667eea;
+            position: relative;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
         }
         
         .stats-grid {
@@ -176,19 +194,40 @@ const htmlContent = `<!DOCTYPE html>
             padding: 2rem;
             color: #666;
         }
+        
+        .success-message {
+            color: green;
+            padding: 1rem;
+            background: #d4edda;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .error-message {
+            color: red;
+            padding: 1rem;
+            background: #f8d7da;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .rating-stars {
+            color: #ffc107;
+            margin: 0.5rem 0;
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
         <header class="app-header">
-            <h1> Student Feedback Application</h1>
+            <h1>Student Feedback Application</h1>
             <p>Share your feedback about courses and view what others have to say</p>
         </header>
 
         <nav class="app-nav">
-            <button onclick="showTab('dashboard')" class="active"> Dashboard</button>
-            <button onclick="showTab('submit')"> Submit Feedback</button>
-            <button onclick="showTab('view')"> View Feedback</button>
+            <button onclick="showTab('dashboard')" class="active">Dashboard</button>
+            <button onclick="showTab('submit')">Submit Feedback</button>
+            <button onclick="showTab('view')">View Feedback</button>
         </nav>
 
         <main class="app-main">
@@ -238,17 +277,17 @@ const htmlContent = `<!DOCTYPE html>
                         <label for="rating">Rating *</label>
                         <select id="rating" name="rating" required>
                             <option value="">Select rating</option>
-                            <option value="1">1  - Poor</option>
-                            <option value="2">2  - Fair</option>
-                            <option value="3">3  - Good</option>
-                            <option value="4">4  - Very Good</option>
-                            <option value="5">5   - Excellent</option>
+                            <option value="1">1 Star - Poor</option>
+                            <option value="2">2 Stars - Fair</option>
+                            <option value="3">3 Stars - Good</option>
+                            <option value="4">4 Stars - Very Good</option>
+                            <option value="5">5 Stars - Excellent</option>
                         </select>
                     </div>
                     
                     <button type="submit" class="submit-btn">Submit Feedback</button>
                 </form>
-                <div id="formMessage" style="margin-top: 1rem;"></div>
+                <div id="formMessage"></div>
             </div>
 
             <!-- View Feedback Tab -->
@@ -318,10 +357,12 @@ const htmlContent = `<!DOCTYPE html>
                 if (data.success && data.data.length > 0) {
                     let html = '';
                     data.data.forEach(feedback => {
+                        const stars = '★'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
                         html += \`
                             <div class="feedback-card">
+                                <button class="delete-btn" onclick="deleteFeedback(\${feedback.feedback_id})">Delete</button>
                                 <strong>\${feedback.student_name}</strong> - \${feedback.course_code}
-                                <div style="color: #667eea; margin: 0.5rem 0;">Rating: \${feedback.rating}/5</div>
+                                <div class="rating-stars">\${stars} (\${feedback.rating}/5)</div>
                                 <p>"\${feedback.comments}"</p>
                                 <small style="color: #666;">Submitted on \${new Date(feedback.submission_date).toLocaleDateString()}</small>
                             </div>
@@ -349,7 +390,7 @@ const htmlContent = `<!DOCTYPE html>
             };
             
             const messageDiv = document.getElementById('formMessage');
-            messageDiv.innerHTML = '<div style="color: #666;">Submitting...</div>';
+            messageDiv.innerHTML = '<div class="loading">Submitting...</div>';
             
             try {
                 const response = await fetch(API_BASE_URL + '/feedback', {
@@ -363,18 +404,50 @@ const htmlContent = `<!DOCTYPE html>
                 const data = await response.json();
                 
                 if (data.success) {
-                    messageDiv.innerHTML = '<div style="color: green;">✅ Feedback submitted successfully!</div>';
+                    messageDiv.innerHTML = '<div class="success-message">Feedback submitted successfully!</div>';
                     // Clear form
                     event.target.reset();
                     // Reload dashboard and feedback list
                     loadDashboard();
                     setTimeout(loadFeedback, 1000);
                 } else {
-                    messageDiv.innerHTML = '<div style="color: red;">❌ Error: ' + data.message + '</div>';
+                    messageDiv.innerHTML = '<div class="error-message">Error: ' + data.message + '</div>';
                 }
             } catch (error) {
                 console.error('Error submitting feedback:', error);
-                messageDiv.innerHTML = '<div style="color: red;">❌ Network error. Please try again.</div>';
+                messageDiv.innerHTML = '<div class="error-message">Network error. Please try again.</div>';
+            }
+        }
+        
+        // Delete feedback
+        async function deleteFeedback(feedbackId) {
+            if (!confirm('Are you sure you want to delete this feedback?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_BASE_URL + '/feedback/' + feedbackId, {
+                    method: 'DELETE',
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success message
+                    const container = document.getElementById('feedbackList');
+                    container.innerHTML = '<div class="success-message">Feedback deleted successfully! Reloading...</div>';
+                    
+                    // Reload feedback list and dashboard after a short delay
+                    setTimeout(() => {
+                        loadFeedback();
+                        loadDashboard();
+                    }, 1000);
+                } else {
+                    alert('Error deleting feedback: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error deleting feedback:', error);
+                alert('Network error. Please try again.');
             }
         }
         
@@ -390,7 +463,7 @@ const htmlContent = `<!DOCTYPE html>
 // Write the HTML file
 fs.writeFileSync(path.join(buildDir, 'index.html'), htmlContent);
 
-console.log('✅ Static site built successfully!');
+console.log('Static site built successfully with delete functionality!');
 
 // Helper function to copy directories
 function copyDir(source, destination) {
