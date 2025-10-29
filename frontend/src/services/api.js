@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+// Use environment variable for API URL
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://student-feedback-backend2.onrender.com/api';
 
 // Get all feedback
 export const getAllFeedback = async () => {
