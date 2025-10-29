@@ -1,0 +1,238 @@
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow: hidden;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Background with gradient */
+.splash-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #3c4d9c 0%, #7406e3 50%, #e9e0ea 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Welcome Messages Container */
+.welcome-messages-container {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* Individual Welcome Lines */
+.welcome-line {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+  margin: 15px 0;
+  opacity: 0;
+  transform: translateY(-100px);
+  text-align: center;
+  padding: 10px 30px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  animation: slideDown 0.8s ease-out forwards;
+}
+
+/* Different animation delays for each line */
+.welcome-line.line-1 { animation-delay: 0.4s; }
+.welcome-line.line-2 { animation-delay: 0.8s; }
+.welcome-line.line-3 { animation-delay: 1.0s; }
+.welcome-line.line-4 { animation-delay: 1.4s; }
+.welcome-line.line-5 { animation-delay: 1.8s; }
+.welcome-line.line-6 { animation-delay: 2.0s; }
+.welcome-line.line-7 { animation-delay: 2.4s; }
+.welcome-line.line-8 { animation-delay: 2.8s; }
+.welcome-line.line-9 { animation-delay: 3.0s; }
+.welcome-line.line-10 { animation-delay: 3.4s; }
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Continuous scrolling effect for lines */
+.welcome-line {
+  animation: 
+    slideDown 0.8s ease-out forwards,
+    floatLine 3s ease-in-out 1s infinite;
+}
+
+@keyframes floatLine {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.02);
+  }
+}
+
+/* Fade out lines after display */
+.welcome-line.fade-out {
+  animation: fadeOutUp 0.5s ease-in forwards;
+}
+
+@keyframes fadeOutUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+}
+
+/* Countdown Timer */
+.countdown-timer {
+  position: absolute;
+  bottom: 10%;
+  text-align: center;
+  z-index: 3;
+}
+
+.countdown-circle {
+  width: 80px;
+  height: 80px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+.countdown-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  animation: countdown 5s linear forwards;
+}
+
+@keyframes countdown {
+  0% { content: "5"; }
+  20% { content: "4"; }
+  40% { content: "3"; }
+  60% { content: "2"; }
+  80% { content: "1"; }
+  100% { content: "0"; }
+}
+
+.countdown-number::before {
+  content: "5";
+  animation: countdown 5s linear forwards;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    border-color: rgba(255, 255, 255, 0.8);
+  }
+  100% {
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 1);
+  }
+}
+
+.countdown-timer p {
+  color: white;
+  font-size: 1.1rem;
+  margin: 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  animation: fadeInOut 2s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Splash screen fade out */
+.splash-screen.fade-out {
+  animation: splashFadeOut 0.8s ease-in-out forwards;
+}
+
+@keyframes splashFadeOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.1);
+    visibility: hidden;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .welcome-line {
+    font-size: 1.8rem;
+    margin: 10px 0;
+    padding: 8px 20px;
+  }
+  
+  .countdown-circle {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .countdown-number {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-line {
+    font-size: 1.4rem;
+    margin: 8px 0;
+    padding: 6px 15px;
+  }
+  
+  .countdown-timer p {
+    font-size: 1rem;
+  }
+  
+  .welcome-messages-container {
+    height: 70vh;
+  }
+}
