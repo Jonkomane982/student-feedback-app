@@ -1,10 +1,15 @@
 // Use environment variable for API URL
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://student-feedback-backend2.onrender.com/api';
 
+console.log('API Base URL:', API_BASE_URL); // Debug log
+
 // Get all feedback
 export const getAllFeedback = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/feedback`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const data = await response.json();
     return data;
   } catch (error) {
@@ -23,6 +28,9 @@ export const submitFeedback = async (feedbackData) => {
       },
       body: JSON.stringify(feedbackData),
     });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const data = await response.json();
     return data;
   } catch (error) {
@@ -35,6 +43,9 @@ export const submitFeedback = async (feedbackData) => {
 export const getDashboardStats = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/feedback/dashboard/stats`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const data = await response.json();
     return data;
   } catch (error) {
@@ -49,6 +60,9 @@ export const deleteFeedback = async (feedbackId) => {
     const response = await fetch(`${API_BASE_URL}/feedback/${feedbackId}`, {
       method: 'DELETE',
     });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const data = await response.json();
     return data;
   } catch (error) {
